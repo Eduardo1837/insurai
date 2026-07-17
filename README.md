@@ -17,13 +17,6 @@ generică, din două motive:
   ceea ce cred că spune mai multe despre modul meu de gândire decât un simplu
   landing page.
 
-Am luat în calcul și un calculator de prime de asigurare (mai mult frontend,
-mai puțină logică interesantă) și un extractor de date din documente (mai
-aproape de "automatizare procese", dar necesita OCR/parsing PDF, risc mai mare
-de a nu termina în timp). Am optat pentru chatbot pentru că acoperă cel mai
-bine ambele cerințe ale temei: folosire eficientă a AI-ului **și** produs
-relevant pentru firmă.
-
 ## 2. Decizia arhitecturală principală
 
 Cerința a fost explicit "simplu: FAQ + LLM pentru formulare de răspunsuri", nu
@@ -79,16 +72,7 @@ siguranță — să nu dea sfaturi financiare personalizate, să nu inventeze
 acoperiri), și decizia de a păstra căutarea simplă (cuvinte-cheie) în loc de a
 adăuga complexitate inutilă pentru un MVP de 1-2 zile.
 
-## 4. Ce am lăsat deliberat în afara scope-ului
-
-Din lipsă de timp, dar și pentru că nu erau cerute:
-
-- Autentificare / conturi de utilizator
-- Persistarea conversațiilor (istoricul se pierde la refresh)
-- Căutare vectorială reală (embeddings) în locul potrivirii de cuvinte-cheie
-- Conectare la documente reale ale unei companii (condiții contractuale, PDF-uri)
-
-## 5. Ce aș face într-o versiune 2
+## 6. Ce aș face într-o versiune 2
 
 - Înlocuirea FAQ-ului static cu un index RAG peste documente reale (condiții
   generale, ghiduri interne) — arhitectura curentă e pregătită pentru asta.
@@ -96,33 +80,3 @@ Din lipsă de timp, dar și pentru că nu erau cerute:
   despre ce lipsește din baza de cunoștințe.
 - Escaladare către un consultant uman (ex: buton "vorbește cu un agent") atunci
   când modelul nu are context suficient.
-
-## 6. Rulare locală
-
-```bash
-npm install
-cp .env.example .env.local   # adaugă ANTHROPIC_API_KEY
-npm run dev
-```
-
-Aplicația pornește pe `http://localhost:3000`.
-
-## 7. Deployment (Vercel)
-
-1. Pune proiectul într-un repo GitHub.
-2. Pe [vercel.com](https://vercel.com), "Add New Project" → importă repo-ul.
-3. La Environment Variables, adaugă `ANTHROPIC_API_KEY` cu cheia ta.
-4. Deploy — Vercel detectează automat Next.js, nu sunt setări suplimentare
-   necesare.
-
-## 8. Structura proiectului
-
-```
-app/
-  api/chat/route.js   # endpoint-ul care face retrieval + apel LLM
-  page.js             # UI: hero, chat, secțiuni informative
-  layout.js           # fonturi + metadata
-  globals.css         # sistem de design (culori, tipografie, layout)
-lib/
-  faq.js              # baza de cunoștințe + funcția de căutare
-```
