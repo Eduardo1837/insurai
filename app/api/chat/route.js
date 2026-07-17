@@ -1,9 +1,8 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { searchFAQ } from "../../../lib/faq";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const GEMINI_MODEL = "gemini-3.5-flash";
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
 
 const SYSTEM_PROMPT = `Ești asistentul virtual al departamentului de asigurări. Răspunzi
 scurt, clar și prietenos, în limba română.
@@ -42,26 +41,46 @@ export async function POST(req) {
 
     const recentHistory = Array.isArray(history) ? history.slice(-6) : [];
 
-    const messages = [
+    const contents = [
       ...recentHistory.map((h) => ({
-        role: h.role === "assistant" ? "assistant" : "user",
-        content: h.content,
+        role: h.role === "assistant" ? "model" : "user",
+        parts: [{ text: h.content }],
       })),
       {
         role: "user",
-        content: `Context din baza de cunoștințe:\n${context}\n\nÎntrebarea utilizatorului: ${message}`,
+        parts: [
+          {
+            text: `Context din baza de cunoștințe:\n${context}\n\nÎntrebarea utilizatorului: ${message}`,
+          },
+        ],
       },
     ];
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 400,
-      system: SYSTEM_PROMPT,
-      messages,
+    const geminiRes = await fetch(`${GEMINI_URL}?key=${process.env.GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents,
+        generationConfig: {
+          maxOutputTokens: 1024,
+          temperature: 0.4,
+        },
+      }),
     });
 
-    const textBlock = response.content.find((b) => b.type === "text");
-    const answer = textBlock ? textBlock.text : "Nu am putut genera un răspuns.";
+
+    const data = await geminiRes.json();
+
+    if (!geminiRes.ok) {
+      console.error("Eroare Gemini API:", data);
+      const geminiMessage = data?.error?.message || "Eroare necunoscută de la Gemini.";
+      return Response.json({ error: geminiMessage }, { status: geminiRes.status });
+    }
+
+    const answer =
+      data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") ||
+      "Nu am putut genera un răspuns.";
 
     return Response.json({
       answer,
