@@ -72,7 +72,7 @@ siguranță — să nu dea sfaturi financiare personalizate, să nu inventeze
 acoperiri), și decizia de a păstra căutarea simplă (cuvinte-cheie) în loc de a
 adăuga complexitate inutilă pentru un MVP de 1-2 zile.
 
-## 6. Ce aș face într-o versiune 2
+## 4. Ce aș face într-o versiune 2
 
 - Înlocuirea FAQ-ului static cu un index RAG peste documente reale (condiții
   generale, ghiduri interne) — arhitectura curentă e pregătită pentru asta.
