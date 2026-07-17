@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 
 const QUICK_QUESTIONS = [
   "Diferența dintre RCA și CASCO?",
@@ -86,6 +87,9 @@ export default function Home() {
             InsurAI
           </div>
           <span className="brand-tag">Departament produse digitale</span>
+          <Link href="/pensii" className="nav-link">
+            Simulator pensie →
+          </Link>
         </div>
       </header>
 
