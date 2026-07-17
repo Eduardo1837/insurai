@@ -27,6 +27,9 @@ export async function POST(req) {
       return Response.json({ error: "Mesaj invalid." }, { status: 400 });
     }
 
+    const recentForSearch = Array.isArray(history) ? history.slice(-3) : [];
+    const searchQuery = [...recentForSearch.map((h) => h.content), message].join(" ");
+
     const relevant = searchFAQ(message, 4);
 
     const context =
@@ -65,6 +68,7 @@ export async function POST(req) {
         generationConfig: {
           maxOutputTokens: 1024,
           temperature: 0.4,
+          thinkingConfig: { thinkingBudget: 0 },
         },
       }),
     });
